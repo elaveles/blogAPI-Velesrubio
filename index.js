@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
 const app = express();
 require('dotenv').config();
 
@@ -12,12 +11,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: ['http://localhost:8000', 'http://localhost:3000', 'https://blog-app-rho-mocha.vercel.app'],
+  origin: [
+    'http://localhost:8000',
+    'http://localhost:3000',
+    'https://vercel.app',
+    'https://vercel.live',
+    /\.vercel\.app$/,        
+    /\.vercel\.live$/        
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }
 
 app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://vercel.live https://*.vercel.app;");
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
 
 const userRoutes = require("./routes/user");
 const postRoutes = require("./routes/post");
